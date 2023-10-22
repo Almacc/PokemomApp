@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: EdgeInsets.all(15),
-              //child: Image.asset("images/seller.png", height: 270,),
+              child: Image.asset("images/pokelogo.png", height: 270,),
             ),
           ),
           Form(

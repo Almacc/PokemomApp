@@ -35,7 +35,7 @@ class _MySplashScreenState extends State<MySplashScreen> {
         child: Stack(
           children: [
             Image.asset(
-              "images/pokemonintro.jpg",
+              "images/back1.jpg",
               fit: BoxFit.cover,
               width: double.infinity,
               height: double.infinity,
@@ -43,12 +43,15 @@ class _MySplashScreenState extends State<MySplashScreen> {
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image.asset(
-                  "images/pokelogo.png", // Replace with your image path
-                  height: 150, // Adjust the height as needed
-                  width: 150, // Adjust the width as needed
+                Align(
+                  alignment: Alignment.center, // This centers the child widget
+                  child: Image.asset(
+                    "images/pokelogo.png", // Replace with your image path
+                    height: 300, // Adjust the height as needed
+                    width: 300, // Adjust the width as needed
+                  ),
                 ),
-                const SizedBox(height: 10,),
+                const SizedBox(height: 20,),
               ],
             ),
           ],
