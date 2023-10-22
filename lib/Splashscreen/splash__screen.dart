@@ -32,28 +32,27 @@ class _MySplashScreenState extends State<MySplashScreen> {
     return Material(
       child: Container(
         color: Colors.white,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Stack(
           children: [
-           ///Image.asset("images/back1.jpg"),
-
-            const SizedBox(height: 10,),
-
-            const Padding(
-              padding: const EdgeInsets.all(18.0),
-              child: Text(
-                  "Pokemon",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    color: Colors.black54,
-                    fontSize: 40,
-                    fontFamily: "Signatra",
-                    letterSpacing: 3,
-                  ),
-              ),
+            Image.asset(
+              "images/pokemonintro.jpg",
+              fit: BoxFit.cover,
+              width: double.infinity,
+              height: double.infinity,
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(
+                  "images/pokelogo.png", // Replace with your image path
+                  height: 150, // Adjust the height as needed
+                  width: 150, // Adjust the width as needed
+                ),
+                const SizedBox(height: 10,),
+              ],
             ),
           ],
-        )
+        ),
       ),
     );
   }
