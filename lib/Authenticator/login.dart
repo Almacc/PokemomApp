@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../Widget/error_dialog.dart';
 import '../mainscreens/home_screen.dart';
+import '../mainscreens/main_screen.dart';
 
 
 class LoginScreen extends StatefulWidget {
@@ -65,7 +66,7 @@ class _LoginScreenState extends State<LoginScreen> {
               if (emailcontroller.text.isNotEmpty && passwordcontroller.text.isNotEmpty) {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()),
+                  MaterialPageRoute(builder: (context) => MainScreen()),
                 );
               } else {
                 showDialog(

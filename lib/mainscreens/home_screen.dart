@@ -3,6 +3,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:poke_app_beta/mainscreens/pokemon_detail_screen.dart';
+import 'main_screen.dart';
 import 'pokemon_detail_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -87,7 +88,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     crossAxisCount: 3,
                     childAspectRatio: 0.7,
                   ),
-                  itemCount: pokedex.length,
+                  //itemCount: pokedex.length,
+                  itemCount: pokedex.length > 20 ? 20 : pokedex.length,
                   itemBuilder: (context, index) {
                     var type = pokedex[index]['type'][0];
                     return InkWell( child: Padding(
@@ -196,10 +198,13 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(height: 16.0),
           ElevatedButton(
             onPressed: () {
-              // Add the function you want to execute when the button is pressed
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MainScreen()),
+              );
             },
             child: Text(
-              'Explore',
+              'Back',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
