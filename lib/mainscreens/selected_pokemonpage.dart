@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:math';
 
 class SelectedPokemonPage extends StatefulWidget {
   final String name;
@@ -20,32 +21,214 @@ class SelectedPokemonPage extends StatefulWidget {
 }
 
 class _SelectedPokemonPageState extends State<SelectedPokemonPage> {
-  var pokemon010; // Store Pokemon #010 data
+  var enemy;
+  int pokemonHP = 100;
+  int enemyHP = 100;
+  int attack = 70; // Default attack value for your Pokemon
+  int defense = 40; // Default defense value for your Pokemon
+  int level = 1;
+  final List<String> pokemonSequence = ['010', '013', '016', '019','014','011',
+    '001','007','020','005','017','012','018','015','003','009','006'  ];
+  int currentPokemonIndex = 0;
 
   @override
   void initState() {
     super.initState();
-    fetchPokemon010(); // Fetch Pokemon #010 data
+    fetchPokemon();
   }
 
-  Future<void> fetchPokemon010() async {
+  Future<void> fetchPokemon() async {
+    String nextPokemonNum = pokemonSequence[currentPokemonIndex];
+    await fetchPokemonByNumber(nextPokemonNum);
+  }
+
+  Future<void> fetchPokemonByNumber(String num) async {
     var url = Uri.https(
-        "raw.githubusercontent.com", "/Biuni/PokemonGO-Pokedex/master/pokedex.json");
+      "raw.githubusercontent.com",
+      "/Biuni/PokemonGO-Pokedex/master/pokedex.json",
+    );
     try {
       final response = await http.get(url);
       if (response.statusCode == 200) {
         Map<String, dynamic> data = json.decode(response.body);
-        var pokemon010Data = data['pokemon']
-            .firstWhere((pokemon) => pokemon['num'] == '010', orElse: () => {});
+        var enemyData =
+        data['pokemon'].firstWhere((pokemon) => pokemon['num'] == num, orElse: () => {});
 
         setState(() {
-          pokemon010 = pokemon010Data;
+          enemy = enemyData;
         });
       } else {
         throw Exception('Failed to load data');
       }
     } catch (error) {
       print('Error: $error');
+    }
+  }
+
+  void battle() {
+    final rng = Random();
+    bool isAttack = rng.nextBool();
+
+    if (enemy != null) {
+      if (isAttack) {
+        setState(() {
+          enemyHP -= attack;
+        });
+      } else {
+        setState(() {
+          if(enemy['num'] == '010' ){
+          pokemonHP -= 10;
+          }
+          if(enemy['num'] == '013' ){
+            pokemonHP -= 20;
+          }
+          if(enemy['num'] == '016' ){
+            pokemonHP -= 30;
+          }
+          if(enemy['num'] == '019' ){
+            pokemonHP -= 40;
+          }
+          if(enemy['num'] == '014' ){
+            pokemonHP -= 40;
+          }
+          if(enemy['num'] == '011'  ){
+            pokemonHP -= 50;
+          }
+          if(enemy['num'] == '007' || enemy['num'] == '020' || enemy['num'] == '001' ){
+            pokemonHP -= 70;
+          }
+          if(enemy['num'] == '005'  ){
+            pokemonHP -= 80;
+          }
+          if(enemy['num'] == '017' || enemy['num'] == '012'|| enemy['num'] == '018' || enemy['num'] == '015'  ){
+            pokemonHP -= 90;
+          }
+          if(enemy['num'] == '003'|| enemy['num'] == '009' ){
+            pokemonHP -= 100;
+          }
+          if(enemy['num'] == '006'){
+            pokemonHP -= 120;
+          }
+
+
+
+        });
+      }
+
+      if (enemyHP <= 0) {
+        if (currentPokemonIndex < pokemonSequence.length - 1) {
+          currentPokemonIndex++;
+          fetchPokemon();
+
+          setState(() {
+            enemyHP = 100;
+
+          });
+          setState(() {
+            pokemonHP += 20;
+            level ++;
+          });
+          if(enemy['num'] == '019' || enemy['num'] == '020'||
+              enemy['num'] == '018'|| enemy['num'] == '009'){
+            showDialog(
+              context: context,
+              builder: (BuildContext context)  {
+                return AlertDialog(
+                  title: Text(
+                    'Welcome to Pokemon Center!',
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'You Pokemon Will Randomly Increment HP Between',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      SizedBox(height: 10),
+                      Text(
+                        '15% to 50%',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.redAccent,
+                        ),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        setState(() {
+                          List<double> percentages = [0.15, 0.20, 0.30, 0.50];
+                          for (double percentage in percentages) {
+                            pokemonHP += (pokemonHP * percentage).round();
+                          }
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.redAccent,
+                      ),
+                      child: Text(
+                        'Continue',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                );
+              },
+            );
+
+          }
+        } else {
+
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Victory!'),
+                content: Text('You have defeated all the Pokemon!'),
+                actions: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      Navigator.pop(context);
+
+                    },
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+        }
+      }
+    }
+
+    if (pokemonHP <= 0) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Defeated!'),
+            content: Text('You have been defeated by ${enemy['name']}!'),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.pop(context); // Go back to previous screen or handle differently
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -76,48 +259,89 @@ class _SelectedPokemonPageState extends State<SelectedPokemonPage> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            // Display selected Pokemon details
-            Text(
-              'Selected Pokemon',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+      body: Stack(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  'Selected Pokemon',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                _buildPokemonBox(
+                  widget.name,
+                  widget.num,
+                  widget.type,
+                  widget.img,
+                  hp: pokemonHP,
+                  attack: attack,
+                  defense: defense,
+                ),
+                SizedBox(height: 40.0),
+                Text(
+                  'Battle against Pokemon',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                if (enemy != null)
+                  _buildPokemonBox(
+                    enemy['name'],
+                    enemy['num'],
+                    enemy['type'][0],
+                    enemy['img'],
+                    hp: enemyHP, // Set enemy Pokemon's HP
+                  ),
+                SizedBox(height: 20.0),
+                ElevatedButton(
+                  onPressed: () {
+                    battle(); // Trigger the battle function
+                  },
+                  child: Text('Battle'), // Button to initiate the battle
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            top: 10,
+            right: 10,
+            child: Container(
+              padding: EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.black.withOpacity(0.7),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.star,
+                    color: Colors.yellow,
+                    size: 18,
+                  ),
+                  SizedBox(width: 4),
+                  Text(
+                    'Lv. $level',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
             ),
-            SizedBox(height: 16.0),
-            // Display the selected Pokemon in a box-like format
-            _buildPokemonBox(
-              widget.name,
-              widget.num,
-              widget.type,
-              widget.img,
-            ),
-            SizedBox(height: 40.0),
-            // Display Pokemon #010 for battle
-            Text(
-              'Battle against Pokemon #010 (Caterpie)',
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            SizedBox(height: 16.0),
-            if (pokemon010 != null)
-            // Display Pokemon #010 in a box-like format for battle
-              _buildPokemonBox(
-                pokemon010['name'],
-                pokemon010['num'],
-                pokemon010['type'][0],
-                pokemon010['img'],
-              ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -126,73 +350,154 @@ class _SelectedPokemonPageState extends State<SelectedPokemonPage> {
       String name,
       String num,
       String type,
-      String img,
-      ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: type == 'Grass'
-            ? Colors.greenAccent
-            : type == 'Water'
-            ? Colors.lightBlueAccent
-            : type == 'Fire'
-            ? Colors.redAccent
-            : type == 'Bug'
-            ? Colors.orange
-            : Colors.grey.withOpacity(0.3),
-        borderRadius: BorderRadius.all(Radius.circular(10)),
-      ),
-      child: Stack(
-        children: [
-          Positioned(
-            bottom: -10,
-            right: -10,
-            child: Image.asset(
-              'images/poke.png',
-              height: 100,
-              fit: BoxFit.fitHeight,
+      String img, {
+        int hp = 100,
+        int attack = 0,
+        int defense = 0,
+      }) {
+    if (num.toLowerCase() == '010') {
+      attack = 10;
+      defense = 20;
+    }
+    else if (num == '013'){
+      attack = 20;
+      defense = 30;
+    }
+    else if (num == '016'){
+      attack = 30;
+      defense = 30;
+    }
+    else if (num == '019'){
+      attack = 40;
+      defense = 40;
+    }
+    else if (num == '014'){
+      attack = 50;
+      defense = 40;
+    }
+    else if (num == '011'){
+      attack = 50;
+      defense = 50;
+    }
+    else if (num == '007'){
+      attack = 70;
+      defense = 40;
+    }
+    else if (num == '005'){
+      attack = 80;
+      defense = 40;
+    }
+    else if (num == '020' || num == '001'){
+      attack = 80;
+      defense = 50;
+    }
+    else if (num == '017' || num == '012'|| num == '018' || num == '015'){
+      attack = 90;
+      defense = 60;
+    }
+    else if (num == '003' || num == '009'){
+      attack = 100;
+      defense = 90;
+    }
+    else if (num == '006'){
+      attack = 120;
+      defense = 100;
+    }
+
+
+
+
+    {
+      return Container(
+        decoration: BoxDecoration(
+          color: type == 'Grass'
+              ? Colors.greenAccent
+              : type == 'Water'
+              ? Colors.lightBlueAccent
+              : type == 'Fire'
+              ? Colors.redAccent
+              : type == 'Bug'
+              ? Colors.orange
+              : Colors.grey.withOpacity(0.3),
+          borderRadius: BorderRadius.all(Radius.circular(10)),
+        ),
+        child: Stack(
+          children: [
+            Positioned(
+              bottom: -10,
+              right: -10,
+              child: Image.asset(
+                'images/poke.png',
+                height: 100,
+                fit: BoxFit.fitHeight,
+              ),
             ),
-          ),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  name,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.white,
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                Text(
-                  num,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.white,
+                  Text(
+                    num,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                Text(
-                  type,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.white,
+                  Text(
+                    type,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.white,
+                    ),
                   ),
-                ),
-                Image.network(
-                  img,
-                  height: 120,
-                  width: 120,
-                  fit: BoxFit.cover,
-                ),
-              ],
+                  Text(
+                    'HP: $hp',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    'Attack: $attack', // Display Attack attribute
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(
+                    'Defense: $defense', // Display Defense attribute
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Image.network(
+                    img,
+                    height: 100,
+                    width: 120,
+                    fit: BoxFit.cover,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-      padding: EdgeInsets.all(10),
-      margin: EdgeInsets.all(10),
-    );
+          ],
+        ),
+        padding: EdgeInsets.all(10),
+        margin: EdgeInsets.all(10),
+      );
+    }
   }
 }

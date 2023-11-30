@@ -283,7 +283,7 @@ class _SelectPokemonState extends State<SelectPokemon> {
                             // Add your logic or navigation here
                           },
                           child: Text(
-                            'Readay for the Tournament',
+                            'Ready for the Tournament',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
