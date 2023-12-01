@@ -118,7 +118,56 @@ class _SelectedPokemonPageState extends State<SelectedPokemonPage> {
       if (enemyHP <= 0) {
         if (currentPokemonIndex < pokemonSequence.length - 1) {
           currentPokemonIndex++;
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text(
+                  'Congratulations!',
+                  style: TextStyle(
+                    color: Colors.deepPurple,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 22.0,
+                  ),
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Well Done! You Have Defeted ${enemy['name']}!',
+                      style: TextStyle(
+                        fontSize: 16.0, // Adjust the font size as needed
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Align(
+                      alignment: Alignment.center,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: Text(
+                          'Continue',
+                          style: TextStyle(fontSize: 16.0),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          primary: Colors.redAccent,
+                          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+              );
+            },
+          );
           fetchPokemon();
+
 
           setState(() {
             enemyHP = 100;
@@ -221,7 +270,7 @@ class _SelectedPokemonPageState extends State<SelectedPokemonPage> {
               ElevatedButton(
                 onPressed: () {
                   Navigator.of(context).pop();
-                  Navigator.pop(context); // Go back to previous screen or handle differently
+                  Navigator.pop(context);
                 },
                 child: Text('OK'),
               ),
@@ -299,14 +348,14 @@ class _SelectedPokemonPageState extends State<SelectedPokemonPage> {
                     enemy['num'],
                     enemy['type'][0],
                     enemy['img'],
-                    hp: enemyHP, // Set enemy Pokemon's HP
+                    hp: enemyHP,
                   ),
                 SizedBox(height: 20.0),
                 ElevatedButton(
                   onPressed: () {
-                    battle(); // Trigger the battle function
+                    battle();
                   },
-                  child: Text('Battle'), // Button to initiate the battle
+                  child: Text('Battle'),
                 ),
               ],
             ),
@@ -403,9 +452,6 @@ class _SelectedPokemonPageState extends State<SelectedPokemonPage> {
       attack = 120;
       defense = 100;
     }
-
-
-
 
     {
       return Container(

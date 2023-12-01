@@ -36,16 +36,16 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               children: [
                 CustomTextField(
-                  data: Icons.email,
+                  data: Icons.person,
                   controller: emailcontroller,
-                  hintText: "Email",
+                  hintText: "User",
                   isObsecre: false,
                 ),
                 CustomTextField(
                   data: Icons.lock,
                   controller: passwordcontroller,
                   hintText: "Password",
-                  isObsecre: false,
+                  isObsecre: true,
                 )
               ],
 
